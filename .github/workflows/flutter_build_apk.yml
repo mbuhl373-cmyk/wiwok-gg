@@ -1,52 +1,35 @@
-name: Flutter Build APK
+name: Build Flutter APK
 
 on:
-  workflow_dispatch:
-    inputs:
-      job_id:
-        required: true
-      zip_url:
-        required: true
-      build_type:
-        default: 'release'
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:          # <-- ini penting
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-      - name: Download zip
-        run: wget -O project.zip "${{ inputs.zip_url }}"
-
-      - name: Extract project
-        run: |
-          mkdir project
-          unzip -q project.zip -d project
-
-      - - name: Setup Flutter
+      - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          channel: 'stable'
-          flutter-version-file: project/pubspec.yaml
+          flutter-version: '3.16.0'
 
-      - name: Get dependencies
-        working-directory: project
+      - name: Install dependencies
         run: flutter pub get
+        working-directory: flutter_app
 
       - name: Build APK
-        working-directory: project
-        run: |
-          if [ "${{ inputs.build_type }}" = "debug" ]; then
-            flutter build apk --debug
-          else
-            flutter build apk --release
-          fi
+        run: flutter build apk --release
+        working-directory: flutter_app
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
         with:
-          name: apk-${{ inputs.job_id }}
-          path: project/build/app/outputs/flutter-apk/*.apk
-          retention-days: 3
+          name: freefire-tools-apk
+          path: flutter_app/build/app/outputs/flutter-apk/app-release.apk
