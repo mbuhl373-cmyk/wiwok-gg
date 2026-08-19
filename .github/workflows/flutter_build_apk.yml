@@ -25,7 +25,7 @@ jobs:
           mkdir project
           unzip -q project.zip -d project
 
-      - name: Setup Flutter
+      - - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
