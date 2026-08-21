@@ -19,18 +19,21 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.4'
-          channel: 'stable'
+          architecture: x64
+
+      - name: Check Flutter
+        run: flutter --version
 
       - name: Install dependencies
-        run: flutter pub get
         working-directory: flutter_app
+        run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release --split-per-abi
         working-directory: flutter_app
+        run: flutter build apk --release --split-per-abi
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: freefire-tools-apk
+          name: flutter-apk
           path: flutter_app/build/app/outputs/flutter-apk/*.apk
